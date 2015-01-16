@@ -28,7 +28,7 @@ from invenio_workflows.tasks.workflows_tasks import (
     wait_for_workflows_to_complete
 )
 
-from invenio_workflows.tasks.logic_tasks import simple_for, end_for, workflow_if, workflow_else
+from workflow.tasks.logic_tasks import simple_for, end_for, workflow_if, workflow_else
 
 from invenio_workflows.tasks.marcxml_tasks import set_obj_extra_data_key
 
