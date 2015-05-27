@@ -22,6 +22,9 @@
 
 from invenio.testsuite import make_test_suite, run_test_suite
 
+<<<<<<< HEAD:tests/test_workflows_others.py
+from test_workflows import WorkflowTasksTestCase
+=======
 from .test_workflows import WorkflowTasksTestCase
 import sys
 from six import StringIO
@@ -38,6 +41,7 @@ def redirect_stderr():
     yield sio
     sio.close()
     sys.stderr = old_stderr
+>>>>>>> workflows: correct testing of stdout on Exception:invenio_workflows/testsuite/test_workflows_others.py
 
 
 class WorkflowOthers(WorkflowTasksTestCase):
@@ -86,15 +90,25 @@ class WorkflowOthers(WorkflowTasksTestCase):
         from invenio_workflows.api import start
         from workflow.errors import WorkflowError
 
+<<<<<<< HEAD:tests/test_workflows_others.py
+        with self.assertRaises(WorkflowError) as e:
+            start("demo_workflow_error", [2],
+                  module_name="unit_tests")
+            self.assertTrue("ZeroDivisionError" in e.message)
+            self.assertTrue("call_a()" in e.message)
+            self.assertTrue("call_b()" in e.message)
+            self.assertTrue("call_c()" in e.message)
+=======
         with redirect_stderr() as stderr:
-            with self.assertRaises(WorkflowError) as e:
+            with self.assertRaises(WorkflowError):
                 stderr.seek(0)
-                start("demo_workflow_error", [2],
-                      module_name="unit_tests")
-                self.assertTrue("ZeroDivisionError" in e.message)
-                self.assertTrue("call_a()" in e.message)
-                self.assertTrue("call_b()" in e.message)
-                self.assertTrue("call_c()" in e.message)
+                start("test_workflow_error", [2], module_name="unit_tests")
+                self.assertTrue("ZeroDivisionError" in stderr)
+                self.assertTrue("call_a()" in stderr)
+                self.assertTrue("call_b()" in stderr)
+                self.assertTrue("call_c()" in stderr)
+>>>>>>> workflows: correct testing of stdout on Exception:invenio_workflows/testsuite/test_workflows_others.py
+
 
 TEST_SUITE = make_test_suite(WorkflowOthers)
 
