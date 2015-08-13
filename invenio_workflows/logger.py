@@ -23,9 +23,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 def get_logger(logger_name, db_handler_obj, level=10, **kwargs):
-    """
-    Initialize and return a Python logger object.
-
+    """Initialize and return a Python logger object.
 
     You can specifiy the handlers to output logs in sys.stderr as well as the
     datebase or anything you want.
@@ -73,9 +71,7 @@ class DbWorkflowLogHandler(logging.Handler, object):
         self.id_name = id_name
 
     def emit(self, record):
-        """ Create the log object in database."""
-        from invenio.ext.sqlalchemy import db
-
+        """Create the log object in database."""
         log_obj = self.model(id_object=getattr(record.obj, self.id_name),
                              log_type=record.levelno,
                              message=record.msg)
@@ -88,8 +84,7 @@ class DbWorkflowLogHandler(logging.Handler, object):
 
 class DbWorkflowLogAdapter(logging.LoggerAdapter):
 
-    """
-    DbWorkflowLogAdapter class.
+    """DbWorkflowLogAdapter class.
 
     This example adapter expects the passed in dict-like object to have a
     'obj' key, whose value in brackets is used during logging.
