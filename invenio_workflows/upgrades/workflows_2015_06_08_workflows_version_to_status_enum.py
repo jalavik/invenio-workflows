@@ -67,15 +67,15 @@ def do_upgrade():
                   db.Column('callback_pos', CallbackPosType()))
 
     # 2.2 Data migration
-    for object_ in db.session.query(DbWorkflowObject):
-        try:
-            object_.callback_pos = object_.extra_data["_task_counter"]
-            del object_.extra_data["_task_counter"]
-        except KeyError:
-            # Assume old version "task_counter"
-            object_.callback_pos = object_.extra_data["task_counter"]
-            del object_.extra_data["task_counter"]
-        object_.save()
+    # for object_ in connection.execute():
+    #     try:
+    #         object_.callback_pos = object_.extra_data["_task_counter"]
+    #         del object_.extra_data["_task_counter"]
+    #     except KeyError:
+    #         # Assume old version "task_counter"
+    #         object_.callback_pos = object_.extra_data["task_counter"]
+    #         del object_.extra_data["task_counter"]
+    #     object_.save()
 
 
 def estimate():
