@@ -32,8 +32,6 @@ import msgpack
 
 from six import text_type
 
-from sqlalchemy import or_
-
 from .registry import actions, workflows
 
 
@@ -214,72 +212,6 @@ def parse_bwids(bwolist):
     """Use ast to eval a string representing a list."""
     import ast
     return list(ast.literal_eval(bwolist))
-
-
-def get_holdingpen_objects(ptags=None):
-    """Get BibWorkflowObject's for display in Holding Pen.
-
-    Uses DataTable naming for filtering/sorting. Work in progress.
-    """
-    from .models import (BibWorkflowObject,
-                         ObjectVersion)
-
-    if ptags is None:
-        ptags = ObjectVersion.name_from_version(ObjectVersion.HALTED)
-
-    tags_copy = ptags[:]
-    version_showing = []
-    type_showing = []
-    uri_showing = []
-    status_showing = []
-    for tag in ptags:
-        if tag in ObjectVersion.MAPPING:
-            version_showing.append(ObjectVersion.MAPPING[tag])
-            tags_copy.remove(tag)
-        elif tag.startswith("type:"):
-            type_showing.append(":".join(tag.split(":")[1:]))
-            tags_copy.remove(tag)
-        elif tag.startswith("uri:"):
-            uri_showing.append(":".join(tag.split(":")[1:]))
-            tags_copy.remove(tag)
-        elif tag.startswith("status:"):
-            status_showing.append(":".join(tag.split(":")[1:]))
-            tags_copy.remove(tag)
-
-    ssearch = tags_copy
-    bwobject_list = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id_parent == None  # noqa E711
-    ).filter(not version_showing or BibWorkflowObject.version.in_(version_showing),
-        or_(*[BibWorkflowObject.data_type.like(type_.replace("*", "%"))
-              for type_ in type_showing]),
-        or_(*[BibWorkflowObject.uri.like(uri.replace("*", "%"))
-              for uri in uri_showing]),
-        or_(*[BibWorkflowObject.status.like(status.replace("*", "%"))
-              for status in status_showing])
-    ).all()
-
-    if ssearch and ssearch[0]:
-        if not isinstance(ssearch, list):
-            if "," in ssearch:
-                ssearch = ssearch.split(",")
-            else:
-                ssearch = [ssearch]
-
-        bwobject_list_tmp = []
-        for bwo in bwobject_list:
-            results = {
-                "created": get_pretty_date(bwo),
-                "type": get_type(bwo),
-                "title": None,
-                "description": None
-            }
-            results.update(get_formatted_holdingpen_object(bwo))
-
-            if check_term_in_data(ssearch, results):
-                bwobject_list_tmp.append(bwo)
-
-        bwobject_list = bwobject_list_tmp
-    return bwobject_list
 
 
 def get_versions_from_tags(tags):
@@ -493,8 +425,11 @@ def get_rendered_task_results(obj):
     return results
 
 
-def get_rendered_row(bwo):
+def get_rendered_row(b_id):
     """Return a single formatted row."""
+    from .models import BibWorkflowObject
+
+    bwo = BibWorkflowObject.query.get(b_id)
     preformatted = get_formatted_holdingpen_object(bwo)
     return render_template(
         'workflows/list_row.html',
@@ -506,10 +441,10 @@ def get_rendered_row(bwo):
     )
 
 
-def get_rows(object_list):
+def get_rows(id_list):
     """Return all rows formatted."""
-    return [get_rendered_row(bwo)
-            for bwo in object_list]
+    return [get_rendered_row(bid)
+            for bid in id_list]
 
 
 def get_previous_next_objects(object_list, current_object_id):

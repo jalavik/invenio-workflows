@@ -40,6 +40,7 @@ from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 
 from .logger import BibWorkflowLogHandler, get_logger
+from .signals import workflow_object_saved
 
 
 class ObjectVersion(object):
@@ -785,6 +786,7 @@ class BibWorkflowObject(db.Model):
         db.session.add(self)
         if self.id is not None:
             self.log.debug("Saving object: %s" % (self.id or "new",))
+        workflow_object_saved.send(self)
 
     @classmethod
     def get(cls, *criteria, **filters):

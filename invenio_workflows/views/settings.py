@@ -24,14 +24,16 @@ from __future__ import absolute_import
 from flask import Blueprint, request
 
 from flask_breadcrumbs import register_breadcrumb
+
 from flask_login import login_required
+
 from flask_menu import register_menu
 
 from invenio.base.decorators import templated
 from invenio.base.i18n import _
 
-from .holdingpen import get_holdingpen_objects
 from ..models import ObjectVersion
+from ..search import get_holdingpen_objects
 
 
 blueprint = Blueprint(
@@ -56,7 +58,12 @@ blueprint = Blueprint(
 )
 @templated("workflows/settings/index.html")
 def index():
-    error_state = get_holdingpen_objects([ObjectVersion.name_from_version(ObjectVersion.ERROR)])
-    halted_state = get_holdingpen_objects([ObjectVersion.name_from_version(ObjectVersion.HALTED)])
+    """Render index page."""
+    error_state = get_holdingpen_objects(
+        [ObjectVersion.name_from_version(ObjectVersion.ERROR)]
+    )
+    halted_state = get_holdingpen_objects(
+        [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
+    )
     return dict(error_state=error_state,
                 halted_state=halted_state)
