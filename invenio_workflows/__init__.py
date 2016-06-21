@@ -26,12 +26,12 @@
 
 from __future__ import absolute_import, print_function
 
+from .api import WorkflowObject
 from .ext import InvenioWorkflows
 from .tasks import start, resume, restart
 from .proxies import workflows
 from .engine import WorkflowEngine
 from .models import (
-    WorkflowObject,
     Workflow,
     ObjectStatus,
 )
